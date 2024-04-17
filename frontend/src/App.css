@@ -1,0 +1,50 @@
+.App {
+  text-align: center;
+}
+body{
+  background-image: url("book.jpg");
+  background-size: cover; 
+  background-position: center;
+  align-items: center;
+}
+h1{
+  color: white;
+  text-align: center;
+  font-size: 40px;
+  text-decoration:underline;
+}
+table {
+  margin: 20px auto;
+}
+th {
+  background-color:darksalmon;
+  color: black;
+  font-weight: bold;
+  padding: 5px;
+}
+td {
+  padding: 5px;
+}
+tr{
+  background-color: white;
+}
+p{
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+input {
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+label{
+  font-weight: bold;
+  color: white;
+}
