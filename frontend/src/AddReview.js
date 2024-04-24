@@ -40,6 +40,7 @@ const AddReview = () =>{
             handleAddReview(e);
         } else {
             handleOfflineSubmit(review);
+            setTimeout(() => handleSubmit(e), 20000);
         }
     };
 

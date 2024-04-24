@@ -48,6 +48,7 @@ const EditReview = () =>{
             updateReview(e);
         } else {
             handleOfflineSubmit(review);
+            setTimeout(() => handleSubmit(e), 20000);
         }
     };
 

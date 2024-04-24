@@ -40,6 +40,7 @@ const AddBook = () =>{
             handleAddBookSubmit(e);
         } else {
             handleOfflineSubmit(book);
+            setTimeout(() => handleSubmit(e), 20000);
         }
     };
 

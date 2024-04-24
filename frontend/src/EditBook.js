@@ -48,6 +48,7 @@ const EditBook = () =>{
             updateBook(e);
         } else {
             handleOfflineSubmit(book);
+            setTimeout(() => handleSubmit(e), 20000);
         }
     };
 
