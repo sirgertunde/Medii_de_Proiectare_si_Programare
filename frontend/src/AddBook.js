@@ -20,7 +20,7 @@ const AddBook = () =>{
                 body: JSON.stringify(newBook)
             });
             console.log(response);
-            window.location = "/";
+            window.location = "/booksAndReviews";
         } catch (err) {
             console.error(err.message);
         }

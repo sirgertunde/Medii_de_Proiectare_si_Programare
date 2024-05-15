@@ -20,7 +20,7 @@ const AddReview = () =>{
                 body: JSON.stringify(newReview)
             });
             console.log(response);
-            window.location = "/";
+            window.location = "/booksAndReviews";
         } catch (err) {
             console.error(err.message);
         }
