@@ -1,16 +1,38 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isOnlineReviews, handleOfflineSubmit } from "./OfflineUtils";
 
 const AddReview = () =>{
+    const [username, setUserName] = useState("");
     const [review, setReview] = useState({id:"", user:"", text:"", bookid:""});
+
+    const getProfile = async () => {
+        try {
+          const res = await fetch("http://localhost:3001/dashboard/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+    
+          const parseData = await res.json();
+          setUserName(parseData.username);
+        } catch (err) {
+          console.error(err.message);
+        }
+      };
+
+    useEffect(() => {
+        getProfile();
+    }, []);
 
     const handleAddReview = async(e) => {
         e.preventDefault();
         try {
             const newReview = {
                 id: parseInt(review.id),
-                user:review.user,
+                user:username,
                 text:review.text,
                 bookid: parseInt(review.bookid)
             };
@@ -74,7 +96,7 @@ const AddReview = () =>{
                     <input type="text" name="id" placeholder="Enter id" value={review.id} onChange={handleChange}></input>
                 </label>
                 <label> Username
-                    <input type="text" name="user" placeholder="Enter user name" value={review.user} onChange={handleChange}></input>
+                    <input type="text" name="user" placeholder="Enter user name" value={username}></input>
                 </label>
                 <label> Text
                     <input type="text" name="text" placeholder="Enter text" value={review.text} onChange={handleChange}></input>
