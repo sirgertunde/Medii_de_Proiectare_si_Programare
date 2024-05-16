@@ -14,15 +14,37 @@ const AddReview = () =>{
                 text:review.text,
                 bookid: parseInt(review.bookid)
             };
+            const isBookIdValid = await validateBookId(newReview.bookid, localStorage.getItem("token"));
+            if (!isBookIdValid) {
+                alert("Invalid book ID");
+            }
             const response = await fetch("http://localhost:3001/api/reviews", {
                 method:"POST",
-                headers: {"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
                 body: JSON.stringify(newReview)
             });
             console.log(response);
             window.location = "/booksAndReviews";
         } catch (err) {
             console.error(err.message);
+        }
+    };
+
+    const validateBookId = async (bookId, token) => {
+        try {
+            const response = await fetch(`http://localhost:3001/api/books/${bookId}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            return response.ok;
+        } catch (error) {
+            console.error("Error validating book ID:", error);
+            return false;
         }
     };
 

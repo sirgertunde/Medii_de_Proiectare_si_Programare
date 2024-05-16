@@ -8,7 +8,12 @@ const ViewBook = () =>{
     useEffect(() => {
         const fetchBook = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/books/${id}`);
+            const response = await fetch(`http://localhost:3001/api/books/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            });
             const data = await response.json();
             setBook(data);
         } catch (error) {

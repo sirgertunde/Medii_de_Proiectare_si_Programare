@@ -7,7 +7,6 @@ const ListBooksAndReviews = () => {
     
     const getBooks = async () =>{
         try {
-            //const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc");
             const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc", {
             method: "GET",
             headers: {
@@ -24,7 +23,13 @@ const ListBooksAndReviews = () => {
 
     const getReviews = async () =>{
         try {
-            const response = await fetch("http://localhost:3001/api/reviews");
+            const response = await fetch("http://localhost:3001/api/reviews", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            }
+            });
             const jsonData = await response.json();
             setReviews(jsonData);
         } catch (err) {
@@ -41,7 +46,11 @@ const ListBooksAndReviews = () => {
         try {
             id = parseInt(id);
             const bookToDelete = await fetch(`http://localhost:3001/api/books/${id}`,{
-                method:"DELETE"
+                method:"DELETE",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
             });
             setBooks(books.filter(book => book.id !== id));
         } catch (err) {
@@ -53,7 +62,11 @@ const ListBooksAndReviews = () => {
         try {
             id = parseInt(id);
             const reviewToDelete = await fetch(`http://localhost:3001/api/reviews/${id}`,{
-                method:"DELETE"
+                method:"DELETE",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
             });
             setReviews(reviews.filter(review => review.id !== id));
         } catch (err) {

@@ -9,7 +9,12 @@ const EditBook = () =>{
     useEffect(() => {
         const fetchBook = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/books/${id}`);
+            const response = await fetch(`http://localhost:3001/api/books/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            });
             const data = await response.json();
             setBook(data);
         } catch (error) {
@@ -32,7 +37,10 @@ const EditBook = () =>{
             const body = {...book};
             const response = await fetch(`http://localhost:3001/api/books/${book.id}`, {
                 method:"PATCH",
-                headers:{"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
                 body: JSON.stringify(body)
             });
             window.location = "/booksAndReviews";

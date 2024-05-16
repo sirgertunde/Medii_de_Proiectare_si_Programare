@@ -9,7 +9,12 @@ const EditReview = () =>{
     useEffect(() => {
         const fetchReview = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/reviews/${id}`);
+            const response = await fetch(`http://localhost:3001/api/reviews/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            });
             const data = await response.json();
             setReview(data);
         } catch (error) {
@@ -32,7 +37,10 @@ const EditReview = () =>{
             const body = {...review};
             const response = await fetch(`http://localhost:3001/api/reviews/${review.id}`, {
                 method:"PATCH",
-                headers:{"Content-Type": "application/json"},
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(body)
             });
             window.location = "/booksAndReviews";

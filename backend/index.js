@@ -20,23 +20,9 @@ app.use(express.json());
 app.use("/auth", require("./jwtAuth"));
 app.use("/dashboard", require("./dashboard"));
 
-const validateBookId = async (bookId) => {
-    try {
-        const response = await fetch(`http://localhost:3001/api/books/${bookId}`);
-        return response.ok;
-    } catch (error) {
-        console.error("Error validating book ID:", error);
-        return false;
-    }
-};
-
-app.post("/api/reviews", async(req, res)=>{
+app.post("/api/reviews", authorize, async(req, res)=>{
     try {
         const {id, user, text, bookid} = req.body;
-        const isBookIdValid = await validateBookId(bookid);
-        if (!isBookIdValid) {
-            return res.status(400).json({ error: "Invalid book ID" });
-        }
         const newReview = await pool.query("INSERT INTO reviews (id, \"user\", text, bookid) VALUES ($1, $2, $3, $4) RETURNING *", [id, user, text, bookid]);
         res.status(201).json({ message: "Review added successfully", review: newReview.rows[0] });
     } catch (err) {
@@ -58,7 +44,7 @@ app.post("/api/books", authorize, async(req, res)=>{
     }
 });
 
-app.get("/api/reviews", async (req, res)=>{
+app.get("/api/reviews", authorize, async (req, res)=>{
     try {
         const result = await pool.query("SELECT * FROM reviews");
         const reviews = result.rows;
@@ -95,7 +81,7 @@ app.get("/api/books", authorize, async (req, res)=>{
     }
 });
 
-app.get("/api/reviews/:id", async(req, res)=>{
+app.get("/api/reviews/:id", authorize, async(req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const result = await pool.query('SELECT * FROM reviews WHERE id = $1', [id])
@@ -109,7 +95,7 @@ app.get("/api/reviews/:id", async(req, res)=>{
     }
 });
 
-app.get("/api/books/:id", async(req, res)=>{
+app.get("/api/books/:id", authorize, async(req, res)=>{
     try {
         const bookId = parseInt(req.params.id);
         const userId = req.user.id;
@@ -125,7 +111,7 @@ app.get("/api/books/:id", async(req, res)=>{
     }
 });
 
-app.patch("/api/reviews/:id", async(req, res)=>{
+app.patch("/api/reviews/:id", authorize, async(req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const {user, text, bookid} = req.body;
@@ -141,7 +127,7 @@ app.patch("/api/reviews/:id", async(req, res)=>{
     }
 });
 
-app.patch("/api/books/:id", async(req, res)=>{
+app.patch("/api/books/:id", authorize, async(req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const {title, author, yearpublished} = req.body;
@@ -160,7 +146,7 @@ app.patch("/api/books/:id", async(req, res)=>{
     }
 });
 
-app.delete("/api/reviews/:id", async (req, res)=>{
+app.delete("/api/reviews/:id", authorize, async (req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const result = await pool.query('DELETE FROM reviews WHERE id = $1', [id]);
@@ -174,7 +160,7 @@ app.delete("/api/reviews/:id", async (req, res)=>{
     }
 });
 
-app.delete("/api/books/:id", async (req, res)=>{
+app.delete("/api/books/:id", authorize, async (req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const result = await pool.query('DELETE FROM books WHERE id = $1', [id]);

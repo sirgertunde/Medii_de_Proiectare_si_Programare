@@ -8,7 +8,12 @@ const ViewReview = () =>{
     useEffect(() => {
         const fetchReview = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/reviews/${id}`);
+            const response = await fetch(`http://localhost:3001/api/reviews/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json"
+                }
+            });
             const data = await response.json();
             setReview(data);
         } catch (error) {
