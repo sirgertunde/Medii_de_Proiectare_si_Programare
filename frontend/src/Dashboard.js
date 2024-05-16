@@ -8,7 +8,10 @@ const Dashboard = ({ setAuth }) => {
     try {
       const res = await fetch("http://localhost:3001/dashboard/", {
         method: "POST",
-        headers: { jwt_token: localStorage.token }
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
       });
 
       const parseData = await res.json();

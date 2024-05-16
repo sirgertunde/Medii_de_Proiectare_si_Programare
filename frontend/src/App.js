@@ -16,11 +16,17 @@ import Dashboard from "./Dashboard";
 function App() {
   const checkAuthenticated = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setIsAuthenticated(false);
+        return;
+      }
       const res = await fetch("http://localhost:3001/auth/verify", {
         method: "POST",
         headers: { 
-          jwt_token: localStorage.token
-         }
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
       });
       const parseRes = await res.json();
       parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);

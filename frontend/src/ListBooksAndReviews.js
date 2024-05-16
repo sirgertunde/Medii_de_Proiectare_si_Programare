@@ -7,7 +7,14 @@ const ListBooksAndReviews = () => {
     
     const getBooks = async () =>{
         try {
-            const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc");
+            //const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc");
+            const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            }
+            });
             const jsonData = await response.json();
             setBooks(jsonData);
         } catch (err) {
@@ -64,7 +71,7 @@ const ListBooksAndReviews = () => {
                     <th>Publication year</th>
                     <th>Actions</th>
                 </tr>
-                {books.map(book =>
+                {Array.isArray(books) && books.map(book =>
                     <tr>
                         <td>{book.title}</td>
                         <td>{book.author}</td>
@@ -89,7 +96,7 @@ const ListBooksAndReviews = () => {
                     <th>Book id</th>
                     <th>Actions</th>
                 </tr>
-                {reviews.map(review =>
+                {Array.isArray(reviews) && reviews.map(review =>
                     <tr>
                         <td>{review.user}</td>
                         <td>{review.text}</td>

@@ -5,7 +5,14 @@ export const isOnlineBooks = async () => {
             alert("Network error. The internet is down.")
             return false;
         }
-        const response = await fetch("http://localhost:3001/api/books");
+        //const response = await fetch("http://localhost:3001/api/books");
+        const response = await fetch("http://localhost:3001/api/books", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            }
+        });
         return response.ok;
     } catch (error) {
         alert("Network error. The backend is down.")
@@ -20,7 +27,14 @@ export const isOnlineReviews = async () => {
             alert("Network error. The internet is down.")
             return false;
         }
-        const response = await fetch("http://localhost:3001/api/reviews");
+        //const response = await fetch("http://localhost:3001/api/reviews");
+        const response = await fetch("http://localhost:3001/api/reviews", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            }
+        });
         return response.ok;
     } catch (error) {
         alert("Network error. The backend is down.")

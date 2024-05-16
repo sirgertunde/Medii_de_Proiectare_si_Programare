@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require('cors');
 const pool = require("./db");
+const authorize = require("./authorize");
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const port = process.env.PORT;
 const corsOptions = {
     origin: 'http://localhost:3000',
     methods: 'GET,POST,PATCH,DELETE',
-    allowedHeaders: 'Content-Type,Authorization,jwt_token',
+    allowedHeaders: 'Content-Type,Authorization',
 };
 
 app.use(cors(corsOptions));
@@ -43,15 +44,19 @@ app.post("/api/reviews", async(req, res)=>{
     }
 })
 
-app.post("/api/books", async(req, res)=>{
+app.post("/api/books", authorize, async(req, res)=>{
     try {
-        const {id, title, author, yearpublished} = req.body;
-        const newBook = await pool.query('INSERT INTO books (id, title, author, yearpublished) VALUES ($1, $2, $3, $4) RETURNING *', [id, title, author, yearpublished]);
+        const { id, title, author, yearpublished } = req.body;
+        const userid = req.user.id;
+
+        const newBook = await pool.query('INSERT INTO books (id, title, author, yearpublished, userid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [id, title, author, yearpublished, userid]);
+        
         res.status(201).json({ message: "Book added successfully", book: newBook.rows[0] });
     } catch (err) {
         console.error(err.message);
+        res.status(500).json({ error: "Server error" });
     }
-})
+});
 
 app.get("/api/reviews", async (req, res)=>{
     try {
@@ -68,22 +73,25 @@ app.get("/api/reviews", async (req, res)=>{
     }
 });
 
-app.get("/api/books", async (req, res)=>{
+app.get("/api/books", authorize, async (req, res)=>{
     try {
         let sortOrder = "ASC";
         if (req.query.sort === "yearpublished_desc") {
             sortOrder = "DESC";
         }
-        const result = await pool.query(`SELECT * FROM books ORDER BY yearpublished ${sortOrder}`);
+        const userId = req.user.id;
+        const result = await pool.query(`SELECT * FROM books WHERE userid = $1 ORDER BY yearpublished ${sortOrder}`, [userId]);
         const books = result.rows;
         const booksWithIntegerFields = books.map(book => ({
             ...book,
             id: parseInt(book.id),
-            yearpublished: parseInt(book.yearpublished)
+            yearpublished: parseInt(book.yearpublished),
+            userid: parseInt(book.userid),
           }));
           res.status(200).json(booksWithIntegerFields);
     } catch (err) {
         console.error(err.message);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
@@ -103,15 +111,17 @@ app.get("/api/reviews/:id", async(req, res)=>{
 
 app.get("/api/books/:id", async(req, res)=>{
     try {
-        const id = parseInt(req.params.id);
-        const result = await pool.query('SELECT * FROM books WHERE id = $1', [id])
+        const bookId = parseInt(req.params.id);
+        const userId = req.user.id;
+        const result = await pool.query('SELECT * FROM books WHERE id = $1 AND userid = $2', [bookId, userId]);
         const book = result.rows[0];
         if (!book) {
-            return res.status(404).json({ error: "Book not found" });
+            return res.status(404).json({ error: "Book not found or unauthorized" });
         }
         res.status(200).json(book);
     } catch (err) {
         console.error(err.message);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
@@ -135,15 +145,18 @@ app.patch("/api/books/:id", async(req, res)=>{
     try {
         const id = parseInt(req.params.id);
         const {title, author, yearpublished} = req.body;
+        const userid = req.user.id;
+        const book = await pool.query('SELECT * FROM books WHERE id = $1 AND userid = $2', [id, userid]);
+        if (book.rows.length === 0) {
+            console.error(`Book with ID ${id} not found or does not belong to the authenticated user.`);
+            return res.status(404).json({ error: "Book not found or unauthorized" });
+        }
         const result = await pool.query('UPDATE books SET title = $1, author = $2, yearpublished = $3 WHERE id = $4 RETURNING *', [title, author, yearpublished, id]);
         const updatedBook = result.rows[0];
-        if (!updatedBook) {
-        console.error(`Book with ID ${id} not found.`);
-        return res.status(404).json({ error: "Book not found" });
-        }
         res.status(200).json({ message: "Book updated successfully", book: updatedBook });
     } catch (err) {
         console.error(err.message);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
