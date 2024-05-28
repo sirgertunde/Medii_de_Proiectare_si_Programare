@@ -27,7 +27,7 @@ const ViewReview = () =>{
         <div>
             <h1>Review Details</h1>
             <p>ID: {review.id}</p>
-            <p>Username: {review.user}</p>
+            <p>User ID: {review.userid}</p>
             <p>Text: {review.text}</p>
             <p>Book ID: {review.bookid}</p>
         </div>

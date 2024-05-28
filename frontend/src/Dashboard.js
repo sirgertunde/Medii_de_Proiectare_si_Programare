@@ -1,8 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const Dashboard = ({ setAuth }) => {
   const [username, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const fetchUserRole = () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const role = decodedToken.user.role;
+          const idOfUser = decodedToken.user.id;
+          setUserRole(role);
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    };
+    fetchUserRole();
+  }, []);
 
   const getProfile = async () => {
     try {
@@ -33,6 +52,7 @@ const Dashboard = ({ setAuth }) => {
 
   useEffect(() => {
     getProfile();
+    console.log(userRole);
   }, []);
 
   return (
@@ -44,6 +64,10 @@ const Dashboard = ({ setAuth }) => {
       </button>
       <br></br>
       <Link to="/booksAndReviews" style={{ color: 'yellow' }}>See books and reviews</Link>
+      <br></br>
+      {userRole === "admin" ? (
+            <Link to="/admin" style={{ color: 'yellow' }}>Go to admin panel</Link>
+      ) : null}
     </div>
   );
 };

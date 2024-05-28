@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Login = ({ setAuth }) => {
-  const [inputs, setInputs] = useState({
-    email: "",
-    password: ""
-  });
-
+  const [inputs, setInputs] = useState({email: "", password: ""});
   const { email, password } = inputs;
 
   const onChange = e =>
@@ -27,9 +23,7 @@ const Login = ({ setAuth }) => {
           body: JSON.stringify(body)
         }
       );
-
       const parseRes = await response.json();
-
       if (parseRes.jwtToken) {
         localStorage.setItem("token", parseRes.jwtToken);
         setAuth(true);

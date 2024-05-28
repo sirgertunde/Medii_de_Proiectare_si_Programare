@@ -1,10 +1,31 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 const ListBooksAndReviews = () => {
     const [books, setBooks] = useState([]);
     const [reviews, setReviews] = useState([]);
-    
+    const [userRole, setUserRole] = useState("");
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        const fetchUserRole = () => {
+          const token = localStorage.getItem("token");
+          if (token) {
+            try {
+              const decodedToken = jwtDecode(token);
+              const role = decodedToken.user.role;
+              const idOfUser = decodedToken.user.id;
+              setUserRole(role);
+              setUserId(idOfUser);
+            } catch (error) {
+              console.error("Error decoding token:", error);
+            }
+          }
+        };
+        fetchUserRole();
+      }, []);
+
     const getBooks = async () =>{
         try {
             const response = await fetch("http://localhost:3001/api/books?sort=yearpublished_asc", {
@@ -76,60 +97,90 @@ const ListBooksAndReviews = () => {
 
     return (
         <div>
-            <h1>Books</h1>
-            <table>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Publication year</th>
-                    <th>Actions</th>
+          <h1>Books</h1>
+          <table>
+            <thead>
+              <tr>
+              <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Publication year</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(books) && books.map((book) => (
+                <tr key={book.id}>
+                    <td>{book.id}</td>
+                  <td>{book.title}</td>
+                  <td>{book.author}</td>
+                  <td>{book.yearpublished}</td>
+                  <td>
+                    <Link to={`/viewBook/${book.id}`}>
+                      <button>View</button>
+                    </Link>
+                    {(userRole === "manager" && book.userid === userId) || userRole === "admin" ? (
+                      <>
+                        <Link to={`/editBook/${book.id}`}>
+                          <button>Edit</button>
+                        </Link>
+                        <button onClick={()=>deleteBook(book.id)}>Delete</button>
+                      </>
+                    ) : null}
+                  </td>
                 </tr>
-                {Array.isArray(books) && books.map(book =>
-                    <tr>
-                        <td>{book.title}</td>
-                        <td>{book.author}</td>
-                        <td>{book.yearpublished}</td>
-                        <td>
-                            <Link to={`/editBook/${book.id}`}><button>Edit</button></Link>
-                            <button onClick={()=>deleteBook(parseInt(book.id))}>Delete</button>
-                            <Link to={`/viewBook/${book.id}`}><button>View</button></Link>
-                        </td>
-                    </tr>
-                    )
-                }
-            </table>
+              ))}
+            </tbody>
+          </table>
+          {userRole === "manager" || userRole === "admin" ? (
             <Link to="/addBook">
                 <button>Add book</button>
             </Link>
-            <h1>Reviews</h1>
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>Text</th>
-                    <th>Book id</th>
-                    <th>Actions</th>
+            ) : null}
+          <h1>Reviews</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Text</th>
+                <th>Book ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(reviews) && reviews.map((review) => (
+                <tr key={review.id}>
+                  <td>{review.userid}</td>
+                  <td>{review.text}</td>
+                  <td>{review.bookid}</td>
+                  <td>
+                    <Link to={`/viewReview/${review.id}`}>
+                      <button>View</button>
+                    </Link>
+                    {(userRole === "manager" && review.userid === userId) || userRole === "admin" ? (
+                      <>
+                        <Link to={`/editReview/${review.id}`}>
+                          <button>Edit</button>
+                        </Link>
+                        <button onClick={()=>deleteReview(review.id)}>Delete</button>
+                      </>
+                    ) : null}
+                  </td>
                 </tr>
-                {Array.isArray(reviews) && reviews.map(review =>
-                    <tr>
-                        <td>{review.user}</td>
-                        <td>{review.text}</td>
-                        <td>{review.bookid}</td>
-                        <td>
-                            <Link to={`/editReview/${review.id}`}><button>Edit</button></Link>
-                            <button onClick={()=>deleteReview(review.id)}>Delete</button>
-                            <Link to={`/viewReview/${review.id}`}><button>View</button></Link>
-                        </td>
-                    </tr>
-                    )
-                }
-            </table>
+              ))}
+            </tbody>
+          </table>
+          {userRole === "manager" || userRole === "admin" ? (
             <Link to="/addReview">
                 <button>Add review</button>
             </Link>
-            <br></br>
-            <Link to="/dashboard" style={{ color: 'yellow' }}>Dashboard</Link>
+            ) : null}
+          <br />
+          <Link to="/dashboard" style={{ color: "yellow" }}>
+            Dashboard
+          </Link>
         </div>
-    );
+      );
 };
 
 export default ListBooksAndReviews;

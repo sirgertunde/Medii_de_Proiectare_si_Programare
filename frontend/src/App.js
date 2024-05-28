@@ -12,8 +12,17 @@ import { isOnlineReviews } from './OfflineUtils';
 import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
+import AdminPanel from "./AdminPanel";
+import { jwtDecode } from 'jwt-decode';
 
 function App() {
+  const [userRole, setUserRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const setAuth = boolean => {
+    setIsAuthenticated(boolean);
+  };
+
   const checkAuthenticated = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -29,11 +38,31 @@ function App() {
         }
       });
       const parseRes = await res.json();
-      parseRes === true ? setIsAuthenticated(true) : setIsAuthenticated(false);
+      if (parseRes) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
     } catch (err) {
       console.error(err.message);
     }
   };
+
+  useEffect(() => {
+    const fetchUserRole = () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const role = decodedToken.user.role;
+          setUserRole(role);
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+    };
+    fetchUserRole();
+  }, []);
 
   useEffect(() => {
     checkAuthenticated();
@@ -45,13 +74,7 @@ function App() {
     };
 
     handleNetworkStatus();
-  });
-
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const setAuth = boolean => {
-    setIsAuthenticated(boolean);
-  };
+  }, []);
 
   return (
     <BrowserRouter>
@@ -80,6 +103,15 @@ function App() {
           <Route exact path="/editReview/:id" element={<EditReview />} />
           <Route exact path="/viewBook/:id" element ={<ViewBook/>}></Route>
           <Route exact path="/viewReview/:id" element ={<ViewReview/>}></Route>
+          {/* <Route exact path="/admin"
+              element={
+                isAuthenticated && userRole === "admin" ? (
+                  <AdminPanel />
+                ) : (
+                  <Navigate to="/login" />
+                )}
+            /> */}
+            <Route exact path="/admin" element ={<AdminPanel/>}></Route>
         </Routes>
       </div>
     </BrowserRouter>

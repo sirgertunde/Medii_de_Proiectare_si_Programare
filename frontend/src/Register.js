@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Register = ({ setAuth }) => {
-  const [inputs, setInputs] = useState({
-    email: "",
-    password: "",
-    username: ""
-  });
-
+  const [inputs, setInputs] = useState({email: "", password: "", username: ""});
   const { email, password, username } = inputs;
 
   const onChange = e =>
@@ -17,8 +12,7 @@ const Register = ({ setAuth }) => {
     e.preventDefault();
     try {
       const body = { email, password, username };
-      const response = await fetch(
-        "http://localhost:3001/auth/register",
+      const response = await fetch("http://localhost:3001/auth/register",
         {
           method: "POST",
           headers: {
@@ -28,7 +22,6 @@ const Register = ({ setAuth }) => {
         }
       );
       const parseRes = await response.json();
-
       if (parseRes.jwtToken) {
         localStorage.setItem("token", parseRes.jwtToken);
         setAuth(true);

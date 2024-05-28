@@ -22,7 +22,9 @@ const AddBook = () =>{
                 },
                 body: JSON.stringify(newBook)
             });
-            console.log(response);
+            if (!response.ok) {
+                throw new Error("Error adding book");
+              }
             window.location = "/booksAndReviews";
         } catch (err) {
             console.error(err.message);

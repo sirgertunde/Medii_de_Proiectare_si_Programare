@@ -30,6 +30,7 @@ const ViewBook = () =>{
             <p>Title: {book.title}</p>
             <p>Author: {book.author}</p>
             <p>Publication year: {book.yearpublished}</p>
+            <p>Owner ID: {book.userid}</p>
         </div>
     );
 };
