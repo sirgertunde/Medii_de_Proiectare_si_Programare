@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -20,10 +18,8 @@ const AdminPanel = () => {
         }
         const data = await response.json();
         setUsers(data);
-        setLoading(false);
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        console.log(err.message);
       }
     };
     fetchUsers();
@@ -52,16 +48,9 @@ const AdminPanel = () => {
         return updatedUsers;
       });
     } catch (err) {
-      setError(err.message);
+      console.log(err.message);
     }
   };
-
-  useEffect(() => {
-    console.log("Users state updated:", users);
-  }, [users]);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>

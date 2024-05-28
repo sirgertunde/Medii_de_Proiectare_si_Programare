@@ -103,15 +103,7 @@ function App() {
           <Route exact path="/editReview/:id" element={<EditReview />} />
           <Route exact path="/viewBook/:id" element ={<ViewBook/>}></Route>
           <Route exact path="/viewReview/:id" element ={<ViewReview/>}></Route>
-          {/* <Route exact path="/admin"
-              element={
-                isAuthenticated && userRole === "admin" ? (
-                  <AdminPanel />
-                ) : (
-                  <Navigate to="/login" />
-                )}
-            /> */}
-            <Route exact path="/admin" element ={<AdminPanel/>}></Route>
+          <Route exact path="/admin" element ={<AdminPanel/>}></Route>
         </Routes>
       </div>
     </BrowserRouter>
